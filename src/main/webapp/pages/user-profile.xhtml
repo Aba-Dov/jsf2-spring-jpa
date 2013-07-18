@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   template="/template/masterLayout.xhtml" 
+	xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <ui:define name="head">
+    	<title>Please update your Profile</title>
+    	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    	<h:outputScript name="js/custom-validations.js" />
+		<script type="text/javascript">
+		    jQuery(document).ready(function() {
+		    	validateEmail(jQuery("#email"), 'save', 'errorDiv');
+		    });
+		</script>
+    </ui:define>
+    <ui:define name="content">
+       <div class="contentText" style="margin-bottom:20px;width: 725px;padding-right:0">
+	    <h:form id="editProfileForm" prependId="false">
+	    	<p:growl id="growl2" showDetail="true" sticky="true" />
+	    	<p:outputPanel id="toUpdate">
+					<p:panel id="signup" header="Please fill the form with your personal data:" style="margin-top:10px;">
+						<h:panelGrid columns="2">
+							<h:outputText for="login" value="Login: *" />
+							<h:outputLabel id="login" value="#{loggedInUser.user.login}"/>
+							
+							<h:outputText for="email" value="Email: *" />
+							<h:panelGroup>
+								<p:inputText id="email" value="#{loggedInUser.user.email}" label="Email" onkeyup="javascript:validateEmail(this,'save','errorDiv')" required="true"/>
+								<div style="padding:5px;color:red" id="errorDiv">Email is not valid</div>
+				            </h:panelGroup>
+				            
+				            <h:outputText for="firstName" value="Firstname: *" />
+							<p:inputText id="firstName" value="#{loggedInUser.user.firstName}" required="true"/>
+							<h:outputText for="lastName" value="Lastname: *" />
+							<p:inputText id="lastName" value="#{loggedInUser.user.lastName}" required="true"/>
+							<h:outputText for="address" value="Address:" />
+							<p:inputText id="address" value="#{loggedInUser.user.address}"/>
+				            <p:commandButton value="Save" id="save" action="#{homeManagedBean.updateUserProfile}"></p:commandButton>
+						</h:panelGrid>
+					</p:panel>
+				</p:outputPanel>
+	    </h:form>
+	    <h:form id="editResumeForm" prependId="false"  enctype="multipart/form-data">
+	    	<p:growl id="growl" showDetail="true" sticky="true"></p:growl>
+	    	<p:outputPanel id="toUpdateResume">
+					<p:panel id="resume" header="Please update your Résumé:" style="margin-top:10px;" toggleable="true">
+						<h:panelGrid columns="2">
+							<h:outputText for="title" value="Choose a title for your Résumé: *"></h:outputText>
+							<p:inputText id="title" value="#{homeManagedBean.resume.title}" required="true"></p:inputText>
+							
+							<h:outputText for="description" value="Objective: *"></h:outputText>
+							<h:panelGroup>
+								<p:editor id="description" value="#{homeManagedBean.resume.description}" width="500"></p:editor>
+				            </h:panelGroup>
+				            <h:outputText for="cv" value="CV: *"></h:outputText>
+				            <p:fileUpload id="cv" value="#{homeManagedBean.file}" required="true" showButtons="false" fileUploadListener="#{homeManagedBean.fileUploadListener}"></p:fileUpload>
+				            <p:commandButton value="Save" id="saveCV" actionListener="#{homeManagedBean.upload}" update="@form"></p:commandButton>
+						</h:panelGrid>
+					</p:panel>
+				</p:outputPanel>
+	    </h:form>
+	  </div>
+	</ui:define>
+    
+</ui:composition>    

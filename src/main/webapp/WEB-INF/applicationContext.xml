@@ -1,0 +1,121 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task-3.2.xsd">
+ 
+	<context:component-scan base-package="com.raissi" />
+	<tx:annotation-driven transaction-manager="jpaTransactionManager"/>
+	<!-- Needed to run @Async methods -->
+	<task:annotation-driven/>
+	
+	<!-- This is required to make Spring recognize View scope -->
+	<bean
+		class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="view">
+					<bean class="com.raissi.spring.customscope.ViewScope" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+	<!-- application.properties will contain all our config data: db username, password, etc... -->
+	<context:property-placeholder location="classpath:application.properties"></context:property-placeholder>
+	<!-- Datasource Config here -->
+	<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		id="dataSource" p:driverClassName="${db.driverClass}" p:password="${db.password}"
+		p:url="${db.url}" p:username="${db.username}">
+	</bean>
+	
+	<!--   This is for CloudBees 
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+	   <property name="jndiName" value="java:comp/env/jdbc/cv_theque"/>
+	</bean>
+	--> 
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceUnitName" value="cvtheque"></property>
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"></property>
+				<property name="showSql" value="true"></property>
+				<property name="generateDdl" value="false"></property>
+			</bean>
+		</property>
+		<!-- Cache config
+		<property name="jpaProperties">
+			<value>
+				hibernate.cache.provider_class=net.sf.ehcache.hibernate.SingletonEhCacheProvider
+				hibernate.cache.use_query_cache=false
+				hibernate.cache.use_second_level_cache=false
+				net.sf.ehcache.configurationResourceName=../config/ehcache.xml
+			</value>
+		</property>
+		 -->
+	</bean>
+    
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.host}"></property>
+		<property name="username" value="${mail.username}"></property>
+		<property name="password" value="${mail.password}"></property>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">${mail.smtp.auth}</prop>
+				<prop key="mail.smtp.port">${mail.smtp.port}</prop>
+				
+				<prop key="mail.smtp.user">${mail.username}</prop>
+				<prop key="mail.smtp.password">${mail.password}</prop>
+				<prop key="mail.smtp.host">${mail.host}</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="mailService" class="com.raissi.service.mail.MailService">
+		<property name="javaMailSender" ref="mailSender" />
+		<property name="freemarkerConfiguration" ref="freemarkerConfiguration"></property>
+	</bean>
+	<!-- Freemarker & templates -->
+	<bean id="freemarkerConfiguration"
+		class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
+		<property name="preferFileSystemAccess" value="false"></property>
+		<property name="templateLoaderPath" value="classpath:/"></property>
+	</bean>
+	<!-- transaction manager for use with a single JPA EntityManagerFactory for transactional data access
+       to a single datasource -->
+	<bean id="jpaTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+	    <property name="entityManagerFactory" ref="entityManagerFactory"/>
+	</bean>
+
+  <!-- enables interpretation of the @Transactional annotation for declerative transaction managment
+       using the specified JpaTransactionManager -->
+  <tx:annotation-driven transaction-manager="jpaTransactionManager" proxy-target-class="true"/>
+  
+  <!-- If we want to use transparent password encryption/decryption with hibernate instead of explicit digest -->
+  <bean id="hibernateStringEncryptor" class="org.jasypt.hibernate4.encryptor.HibernatePBEStringEncryptor">
+        <property name="registeredName">
+            <value>hibernateStringEncryptor</value>
+        </property>
+        <property name="password">
+            <value>simplepassword</value>
+        </property>
+  </bean>
+
+  <bean id="strongTextEncryptor" class="org.jasypt.util.text.StrongTextEncryptor">
+  	<property name="password" value="${security.encryptorPassword}"></property>
+  </bean>
+ 
+</beans>

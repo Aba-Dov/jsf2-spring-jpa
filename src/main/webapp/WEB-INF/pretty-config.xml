@@ -1,0 +1,42 @@
+<pretty-config xmlns="http://ocpsoft.org/prettyfaces/3.3.3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ocpsoft.org/prettyfaces/3.3.3
+               ocpsoft-pretty-faces-3.3.3.xsd">
+
+	<url-mapping id="login">
+		<pattern value="/login" />
+		<view-id value="/pages/login.jsf" />
+	</url-mapping>
+	<url-mapping id="logout">
+		<pattern value="/logout" />
+		<view-id value="/pages/login.jsf" />
+		<action>#{userManagedBean.logout}</action>
+	</url-mapping>
+	<url-mapping id="admin-home">
+		<pattern value="/admin/page" />
+		<view-id value="/pages/admin/page.jsf" />
+	</url-mapping>
+	<url-mapping id="candidate-home">
+		<pattern value="/home" />
+		<view-id value="/pages/user-profile.jsf" />
+	</url-mapping>
+	<url-mapping id="accessdenied">
+		<pattern value="/accessdenied"></pattern>
+		<view-id value="/pages/accessdenied.jsf"></view-id>
+	</url-mapping>
+	<!-- 
+	<url-mapping id="cv-file">
+		<pattern value="/file/cv/#{ user : fileManagedBean.userId }" />
+		<view-id value="/pages/file.jsf" />
+		<action>#{fileManagedBean.displayFile}</action>
+	</url-mapping>
+	 -->
+	<url-mapping id="candidate-edit-profile">
+		<pattern value="/myprofile" />
+		<view-id value="/pages/user-profile.jsf" />
+	</url-mapping>
+	<url-mapping id="awaiting-confirmation">
+		<pattern value="/awaiting-confirmation" />
+		<view-id value="/pages/awaiting-confirmation.jsf" />
+	</url-mapping>
+</pretty-config>

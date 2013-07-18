@@ -1,0 +1,17 @@
+<Context>
+<Loader delegate="true"/>
+<Resource
+        name="jdbc/cv_theque"
+        auth="Container"
+        type="javax.sql.DataSource"
+        maxActive="5"
+        maxIdle="2"
+        username="raissi"
+        maxWait="5000"
+        driverClassName="com.mysql.jdbc.Driver"
+        password="passwordhere"
+        url="jdbc:mysql://ec2-50-19-213-178.compute-1.amazonaws.com:3306/cv_theque"
+        validationQuery="SELECT 1"
+        testOnBorrow="true"/>
+        
+</Context>

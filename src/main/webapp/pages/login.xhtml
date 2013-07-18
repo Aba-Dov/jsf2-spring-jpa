@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"      
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+ 
+    <h:head>
+        <title>Login to Access our CvThèque</title>
+        <h:outputStylesheet library="css" name="login.css"  />
+    </h:head>
+    <h:body>
+    	<h3>Please enter your credentials</h3>
+    	<h:form prependId="false">
+    	   
+    	   <p:outputPanel id="loginPanel">
+	    	   <h:panelGrid id="panel" columns="2" border="0"  rendered="#{empty userManagedBean.user}">
+					<h:outputLabel for="userName" value="Username:"/>
+					<h:panelGroup>
+						<h:inputText id="userName" value="#{userManagedBean.userLogin}" required="true" requiredMessage="Value is required" >
+						</h:inputText>
+						<h:message  for="userName" errorClass="error"/>
+					</h:panelGroup>
+				
+					<h:outputLabel for="password" value="Password:" />
+					<h:panelGroup>
+						<h:inputSecret id="password" value="#{userManagedBean.password}" required="true" requiredMessage="Value is required"/>
+						<h:message for="password" errorClass="error"/>
+					</h:panelGroup>
+					<p:commandButton value="Login" action="#{userManagedBean.login}"></p:commandButton>
+					<p:commandLink value="New user ? Signup" actionListener="#{userManagedBean.showSignUp}" update="toUpdate,loginPanel" immediate="true"></p:commandLink>
+				</h:panelGrid>
+			</p:outputPanel>
+			<p:outputPanel id="toUpdate">
+				<p:panel id="signup" header="Please fill the form:" rendered="#{not empty userManagedBean.user}" style="margin-top:10px;">
+					<p:messages id="messages" showDetail="true" autoUpdate="true"/>
+					<h:panelGrid columns="2">
+						<h:outputText for="login" value="Login: *" />
+						<p:inputText id="login" value="#{userManagedBean.user.login}" label="Login" required="true">
+							<f:validator binding="#{loginValidator}"></f:validator>
+							<p:ajax update="messages" event="keyup" />
+						</p:inputText>
+						
+						<h:outputText for="pwd1" value="Password: *" />
+						<p:password id="pwd1" value="#{userManagedBean.user.password}" match="pwd2" label="Password" required="true"/>
+	
+			            <h:outputLabel for="pwd2" value="Password (confirm): *" />
+			            <p:password id="pwd2" value="#{userManagedBean.user.password}" label="Password (confirmation)" required="true"/>
+			            
+			            <p:commandButton value="Login" action="#{userManagedBean.registerNewUser}"></p:commandButton>
+			            <p:commandButton value="Cancel" actionListener="#{userManagedBean.cancelSignUp}" update="toUpdate,loginPanel"  immediate="true"></p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+			</p:outputPanel>
+    	</h:form>
+    </h:body>
+</html>

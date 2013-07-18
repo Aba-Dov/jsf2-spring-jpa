@@ -1,0 +1,69 @@
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+xmlns="http://www.springframework.org/schema/security"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+<beans:bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
+	<filter-chain-map path-type="ant">
+		<filter-chain pattern="/*" filters="securityContextPersistenceFilter"></filter-chain>
+	</filter-chain-map>
+</beans:bean>
+<beans:bean id="securityContextPersistenceFilter"
+	class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
+	<beans:property name="forceEagerSessionCreation" value="true"></beans:property>
+</beans:bean>
+
+<http pattern="/javax.faces.resource/**" security="none"></http>
+<http pattern="/file/**" security="none"></http>
+<http auto-config="true" use-expressions="true">
+	<form-login login-page="/login"></form-login>
+	
+	<logout logout-url="/logout"></logout>
+	<intercept-url pattern="/login" access="permitAll"></intercept-url>
+	<intercept-url pattern="/accessdenied" access="permitAll"></intercept-url>
+	<intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')"></intercept-url>
+	<intercept-url pattern="/myprofile" access="hasAnyRole('NEW_REGISTERED','ROLE_USER')"></intercept-url>
+	<intercept-url pattern="/awaiting-confirmation" access="hasRole('NOT_ACTIVATED')"></intercept-url>
+	<intercept-url pattern="/confirm" access="permitAll"></intercept-url>
+	<intercept-url pattern="/**" access="hasRole('ROLE_USER')"></intercept-url>
+	
+	<access-denied-handler ref="customAccessDeniedHandler"></access-denied-handler>
+	<remember-me services-ref="rememberMeServices"></remember-me>
+</http>
+
+
+<authentication-manager alias="authenticationManager">
+    <authentication-provider user-service-ref="customUserDetailsService">
+    	<password-encoder hash="md5"></password-encoder>
+	</authentication-provider>
+	<authentication-provider ref="rememberMeAuthenticationProvider"></authentication-provider>
+</authentication-manager> 
+
+<!-- Defines which remember me implementation to use - in this case using a database table to log 'remembered' tokens -->
+<beans:bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
+    <beans:property name="tokenRepository" ref="jdbcTokenRepository"></beans:property> 
+    <beans:property name="userDetailsService" ref="customUserDetailsService"></beans:property>
+    <beans:property name="tokenValiditySeconds" value="864000"></beans:property>
+    <beans:property name="cookieName" value="SPRING_RM"></beans:property>
+    <beans:property name="key" value="myAppKey"></beans:property>
+</beans:bean>
+<!-- Uses a database table to maintain a set of persistent login data -->
+<beans:bean id="jdbcTokenRepository" class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl"> 
+    <beans:property name="createTableOnStartup" value="false"></beans:property> 
+    <beans:property name="dataSource" ref="dataSource"></beans:property> 
+</beans:bean>
+
+<beans:bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider"> 
+  <!-- This ensures that remember-me is added as an authentication provider --> 
+  <beans:property name="key" value="myAppKey"></beans:property> 
+</beans:bean>
+<beans:bean id="rememberMeFilter"
+	class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+	<beans:property name="rememberMeServices" ref="rememberMeServices"></beans:property>
+	<beans:property name="authenticationManager" ref="authenticationManager"></beans:property>
+</beans:bean>
+
+</beans:beans>

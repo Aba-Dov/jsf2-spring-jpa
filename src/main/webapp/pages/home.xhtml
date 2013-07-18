@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   template="/template/masterLayout.xhtml" 
+	xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+ 
+    <ui:define name="head">
+    	<title>JSF Facelets usage - Your home page</title>
+    	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    </ui:define>
+    
+    <ui:define name="content">
+	    <h:panelGrid id="panel" columns="1" border="0" rendered="#{not empty loggedInUser.user}">
+	    <h:panelGroup>
+	    	<div class="contentTitle"><h:outputText value="Welcome home dear #{loggedInUser.user.firstName} #{loggedInUser.user.lastName}" styleClass="h1"/></div>
+		</h:panelGroup>
+			<div class="contentText">
+			  <h:form enctype="multipart/form-data">
+				    <p:messages showDetail="true"/>
+				    <p:fileUpload value="#{homeManagedBean.file}" mode="simple"/>
+				    <p:commandButton value="Submit" ajax="true"
+				                actionListener="#{homeManagedBean.upload}"/>
+				</h:form>
+			  
+			</div>
+	    </h:panelGrid>
+	    
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,50 @@
+package com.raissi.security;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.raissi.domain.User;
+import com.raissi.managedbeans.LoggedInUser;
+import com.raissi.service.UserService;
+
+@Service("customUserDetailsService")
+public class CustomUserDetailsService implements UserDetailsService{
+
+	@Inject
+	private UserService userService;
+	
+	@Override
+	public UserDetails loadUserByUsername(String login)
+			throws UsernameNotFoundException {
+		System.out.println("Trying to fetch user with login: "+login);
+		final User user = userService.findUserByLoginOrEmail(login);
+		if(user == null){
+			throw new UsernameNotFoundException("User not found");
+		}
+		UserDetails details = new CustomUserDetails(user);
+		Authentication authentication =  new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		LoggedInUser loggedInUser = (LoggedInUser)request.getSession().getAttribute("loggedInUser");
+		if(loggedInUser == null){
+			loggedInUser = new LoggedInUser();
+			request.getSession().setAttribute("loggedInUser", loggedInUser);
+		}
+		if(loggedInUser.getUser() == null){
+			loggedInUser.setUser(user);
+		}
+		return details;
+	}
+
+}

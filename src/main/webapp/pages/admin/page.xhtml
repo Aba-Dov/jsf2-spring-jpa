@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   template="/template/masterLayout.xhtml" 
+	xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+ 
+    <ui:define name="head">
+    	<title>Application admin home</title>
+    	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+		<h:outputScript name="js/jquery.gdocsviewer.js" />
+		<script type="text/javascript">
+		    $.noConflict();
+		    function displayPDF() {
+		    	jQuery('a.embed').gdocsViewer({width: 600, height: 750});
+		    	jQuery('#embedURL').gdocsViewer();
+		    };
+		</script>
+    </ui:define>
+    
+    <ui:define name="content">
+	    <h:panelGrid id="panel" columns="1" border="0">
+	    <h:panelGroup>
+	    	<div class="contentTitle"><h:outputText value="Welcome home dear #{loggedInUser.user.firstName} #{loggedInUser.user.lastName}" styleClass="h1"/></div>
+		</h:panelGroup>
+			<div class="contentText">
+			  <p>You are seeing this page because you are an admin </p>
+			 <!-- 
+			 <p:outputPanel id="pdf" rendered="#{not empty homeManagedBean.file}">
+			  	<a href="http://localhost:8080#{request.contextPath}/file/cv" class="embed">PDF test georgetown.edu</a>
+			  	
+			  	<iframe src="http://docs.google.com/viewer?embedded=true&amp;url=http://localhost:8080#{request.contextPath}/file/cv" width="600" height="500" style="border: none;"></iframe>
+			  </p:outputPanel>
+			   -->
+			 <h:form id="form">
+				 <p:dataTable var="user" value="#{adminHomeManagedBean.lazyUserDataModel}" paginator="true" rows="10" paginatorPosition="bottom"
+	                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+	                  id="carTable" lazy="true">
+	                <f:facet name="header">Registered users</f:facet>
+	                <p:column headerText="Firstname">
+			            <h:outputText value="#{user.firstName}"></h:outputText>
+			        </p:column>
+			
+			        <p:column headerText="Lastname">
+			            <h:outputText value="#{user.lastName}"></h:outputText>
+			        </p:column> 
+			        
+			        <p:column headerText="Actions">
+			        	<p:commandButton icon="ui-icon-search" update=":form:cvDetail" actionListener="#{adminHomeManagedBean.generateUserCV(user)}" oncomplete="cvDetail.show()" title="View CV">
+			            </p:commandButton>
+			        </p:column>
+	                 
+	             </p:dataTable> 
+	             <p:dialog header="User CV" widgetVar="cvDetail" width="600" height="500" modal="true" onHide="" showEffect="fade" id="cvDetail">
+	             	<p:ajax event="close" listener="#{adminHomeManagedBean.removeUserCVFromSession}"></p:ajax>
+	             	<p:outputPanel  id="cvDetailPanel" autoUpdate="true">
+			  			<p:media value="/file/cv?id=#{adminHomeManagedBean.selectedUser.userId}" player="pdf"></p:media>
+			  		</p:outputPanel>
+	             </p:dialog>
+             </h:form>
+             
+             <!-- 
+	  			<iframe src="http://docs.google.com/viewer?embedded=true&amp;url=http://#{adminHomeManagedBean.sitePath}#{request.contextPath}/file/cv/#{adminHomeManagedBean.selectedUser.userId}" width="600" height="500" style="border: none;"></iframe>
+	  		 -->
+			</div>
+	    </h:panelGrid>
+	    
+
+	</ui:define>
+
+</ui:composition>

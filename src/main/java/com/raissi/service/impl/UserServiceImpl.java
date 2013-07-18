@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService, Serializable{
 	private StandardStringDigester digester = new StandardStringDigester();
 
 	@Override
-	//@Transactional(readOnly=true)
+	@Transactional(readOnly=true)
 	public User loginUser(String login, String password) {
 		User user = userDao.findUserByLoginOrEmail(login);
 		if(user != null ){
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService, Serializable{
 	}
 	
 	@Override
-	//@Transactional(readOnly=true)
+	@Transactional(readOnly=true)
 	public User findUserByLoginOrEmail(String loginOrEmail) {
 		return userDao.findUserByLoginOrEmail(loginOrEmail);
 	}
@@ -111,5 +111,4 @@ public class UserServiceImpl implements UserService, Serializable{
 		}
 		return user;
 	}
-	
 }

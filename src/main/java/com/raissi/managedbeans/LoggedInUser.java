@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -15,13 +16,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.stereotype.Component;
 
 import com.raissi.domain.User;
 import com.raissi.security.Authority;
 import com.raissi.security.CustomUserDetails;
 import com.raissi.util.UserRole;
 
-@Named("loggedInUser")
+@Component("loggedInUser")
 @Scope("session")
 public class LoggedInUser  implements Serializable{
 	private static final long serialVersionUID = -1033377115353626379L;
@@ -34,6 +36,9 @@ public class LoggedInUser  implements Serializable{
 
 	public User getUser() {
 		return user;
+	}
+	@PostConstruct
+	public void init(){
 	}
 
 	/**
@@ -60,7 +65,7 @@ public class LoggedInUser  implements Serializable{
 		HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request) {
 		    @Override public String getParameter(String name) { return "true"; }            
 		};
-		
+		System.out.println("---------------Remember me services in update: "+rememberMeServices);
 		rememberMeServices.loginSuccess(wrapper, response, authentication);
 	}
 

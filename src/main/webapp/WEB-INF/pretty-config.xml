@@ -39,4 +39,8 @@
 		<pattern value="/awaiting-confirmation" />
 		<view-id value="/pages/awaiting-confirmation.jsf" />
 	</url-mapping>
+	<url-mapping id="error-request">
+		<pattern value="/request-error" />
+		<view-id value="/pages/request-error.jsf" />
+	</url-mapping>
 </pretty-config>

@@ -28,7 +28,7 @@ public class UserManagedBean extends BaseManagedBean{
 	@Inject
 	private UserService userService;
 	@Inject
-	private @Named("loggedInUser") LoggedInUser loggedInUser;
+	private @Named("loggedInUser") ILoggedInUser loggedInUser;
 	
 	private String userLogin;
 	private String password;
@@ -107,7 +107,7 @@ public class UserManagedBean extends BaseManagedBean{
 	}
 
 	@Override
-	protected LoggedInUser getLoggedInUser() {
+	protected ILoggedInUser getLoggedInUser() {
 		return this.loggedInUser;
 	}
 	

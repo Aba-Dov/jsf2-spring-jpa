@@ -15,5 +15,5 @@ public abstract class BaseManagedBean implements Serializable{
 		getLoggedInUser().updateSecurityContext(request, response);
 	}
 	
-	protected abstract LoggedInUser getLoggedInUser();
+	protected abstract ILoggedInUser getLoggedInUser();
 }

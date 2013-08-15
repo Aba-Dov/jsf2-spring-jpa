@@ -22,7 +22,7 @@ import com.raissi.service.UserService;
 public class HomeManagedBean extends BaseManagedBean{
 	private static final long serialVersionUID = 5426154702541976181L;
 	@Inject
-	private @Named("loggedInUser") LoggedInUser loggedInUser;
+	private @Named("loggedInUser") ILoggedInUser loggedInUser;
 	@Inject
 	private ResumeService resumeService;
 	@Inject
@@ -92,7 +92,7 @@ public class HomeManagedBean extends BaseManagedBean{
 		this.resume = resume;
 	}
 	@Override
-	protected LoggedInUser getLoggedInUser() {
+	protected ILoggedInUser getLoggedInUser() {
 		return this.loggedInUser;
 	}
     

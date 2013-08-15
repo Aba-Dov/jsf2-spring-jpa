@@ -19,8 +19,8 @@
 	<context:component-scan base-package="com.raissi" />
 	<tx:annotation-driven transaction-manager="jpaTransactionManager"></tx:annotation-driven>
 	<!-- Needed to run @Async methods -->
-	<task:annotation-driven/>
-	<context:annotation-config />
+	<task:annotation-driven></task:annotation-driven>
+	<context:annotation-config></context:annotation-config>
 	
 	<!-- This is required to make Spring recognize View scope -->
 	<bean
@@ -35,7 +35,7 @@
 	</bean>
 	<!-- application.properties will contain all our config data: db username, password, etc... -->
 	<context:property-placeholder location="classpath:application.properties"></context:property-placeholder>
-	<!-- Datasource Config here -->
+	<!-- Datasource Config for local Tomcat here -->
 	<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource"
 		id="dataSource" p:driverClassName="${db.driverClass}" p:password="${db.password}"
 		p:url="${db.url}" p:username="${db.username}">
@@ -45,7 +45,7 @@
 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 	   <property name="jndiName" value="java:comp/env/jdbc/cv_theque"/>
 	</bean>
-	--> 
+	 -->
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="persistenceUnitName" value="cvtheque"></property>
@@ -53,7 +53,7 @@
 		<property name="jpaVendorAdapter">
 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
 				<property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"></property>
-				<property name="showSql" value="true"></property>
+				<property name="showSql" value="false"></property>
 				<property name="generateDdl" value="false"></property>
 			</bean>
 		</property>
@@ -77,9 +77,6 @@
 			<props>
 				<prop key="mail.smtp.auth">${mail.smtp.auth}</prop>
 				<prop key="mail.smtp.port">${mail.smtp.port}</prop>
-				
-				<prop key="mail.smtp.user">${mail.username}</prop>
-				<prop key="mail.smtp.password">${mail.password}</prop>
 				<prop key="mail.smtp.host">${mail.host}</prop>
 				<prop key="mail.smtp.starttls.enable">true</prop>
 			</props>
@@ -90,8 +87,14 @@
 		<property name="freemarkerConfiguration" ref="freemarkerConfiguration"></property>
 	</bean>
 	<!-- Freemarker & templates -->
+	<!-- Factory bean that creates a FreeMarker Configuration and provides it as
+         bean reference. This bean is intended for any kind of usage of FreeMarker
+         in application code, e.g. for generating email content. -->
+    <!-- FreeMarker Configuration is the Main entry point into the FreeMarker API, this class encapsulates the 
+		 various configuration parameters with which FreeMarker is run -->
 	<bean id="freemarkerConfiguration"
 		class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
+		<!-- Turn this off to always load via SpringTemplateLoader -->
 		<property name="preferFileSystemAccess" value="false"></property>
 		<property name="templateLoaderPath" value="classpath:/"></property>
 	</bean>
@@ -118,5 +121,9 @@
   <bean id="strongTextEncryptor" class="org.jasypt.util.text.StrongTextEncryptor">
   	<property name="password" value="${security.encryptorPassword}"></property>
   </bean>
+  <bean id="basicTextEncryptor" class="org.jasypt.util.text.BasicTextEncryptor">
+  	<property name="password" value="${security.encryptorPassword}"></property>
+  </bean>
+  <bean id="stringDigester" class="org.jasypt.digest.StandardStringDigester"></bean>
  
 </beans>

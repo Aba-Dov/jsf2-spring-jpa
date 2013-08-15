@@ -1,5 +1,6 @@
 package com.raissi.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.raissi.domain.User;
@@ -23,4 +24,17 @@ public interface UserService {
 	public int countCandidates();
 	
 	public User validateUser(String token);
+
+	/**
+	 * Will generate a complete url to the specified pageName and containing the tokenToBeEncrypted as encrypted param,
+	 * ex: http://mysite.com/confirm-registration?token=userNameEncrypted 
+	 * @param pageName
+	 * @param tokenToBeEncrypted
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	String generateUserToken(String pageName, String tokenToBeEncrypted)
+			throws UnsupportedEncodingException;
+
+	User findUserByEncryptedLoginOrEmail(String encrypted);
 }

@@ -21,14 +21,14 @@ public class ConfirmRegistrationManagedBean extends BaseManagedBean{
 	@Inject
 	private UserService userService;
 	@Inject
-	private @Named("loggedInUser") LoggedInUser loggedInUser;
+	private @Named("loggedInUser") ILoggedInUser loggedInUser;
 	@URLQueryParameter("token")
 	private String token;
 	private String confirmMessage = "Please check the link we sent you via email";
 
 	@URLAction
 	public String confirmUserProfile(){
-		//Token is supposed to be decoded
+		//Token is supposed to be decoded by Prettyfaces
 		System.out.println("Token: "+token);
 		User user = userService.validateUser(token);
 		if(user != null){
@@ -52,7 +52,7 @@ public class ConfirmRegistrationManagedBean extends BaseManagedBean{
 		this.confirmMessage = confirmMessage;
 	}
 	@Override
-	protected LoggedInUser getLoggedInUser() {
+	protected ILoggedInUser getLoggedInUser() {
 		return this.loggedInUser;
 	}
 	

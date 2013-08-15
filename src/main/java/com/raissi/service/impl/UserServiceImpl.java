@@ -32,14 +32,16 @@ public class UserServiceImpl implements UserService, Serializable{
 	@Inject
 	private UserDao userDao;
 	
-	@Inject
-	private @Named("strongTextEncryptor")TextEncryptor textEncryptor;
+	@Inject //We will be using basicTextEncryptor for application being deployed on CloudBess since adding JCE is not simple
+			//Use strongTextEncryptor instead if you can add JCE to your JDK
+	private @Named("basicTextEncryptor")TextEncryptor textEncryptor;
 	@Autowired
 	private ServletContext servletContext;
 	@Inject	
 	private @Named("mailService")MailService mailService;
 	
-	private StandardStringDigester digester = new StandardStringDigester();
+	@Inject
+	private @Named("stringDigester")StandardStringDigester digester;
 
 	@Override
 	@Transactional(readOnly=true)
@@ -52,6 +54,7 @@ public class UserServiceImpl implements UserService, Serializable{
 		}
 		return null;
 	}
+	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void saveUser(User user){
 		user.setPassword(digester.digest(user.getPassword()));
@@ -69,32 +72,38 @@ public class UserServiceImpl implements UserService, Serializable{
 	public List<User> getCandidates(int page, int pageSize) {
 		return userDao.findUsers(page, pageSize);
 	}
+	
+	@Override
+	public String generateUserToken(String pageName, String tokenToBeEncrypted) throws UnsupportedEncodingException{
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		String domain = "http://"+request.getServerName()+":"+request.getServerPort();
+		String context = servletContext.getContextPath();
+		//As in the getContextPath() docs, The path starts with a "/" character but does not end with a "/" character 
+		context = domain+context;
+		String encryptedToken = URLEncoder.encode(textEncryptor.encrypt(tokenToBeEncrypted),"UTF-8");
+		return context+"/"+pageName+"?token="+encryptedToken;
+	}
+	
 	@Override
 	public void updateUser(User user) {
 		userDao.update(user);
 		//Prepare to send confirm-register mail:
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		String domain = "http://"+request.getServerName()+":"+request.getServerPort();
-		
-		String context = servletContext.getContextPath();
-		System.out.println("Context path: "+context);
-		//As in the getContextPath() docs, The path starts with a "/" character but does not end with a "/" character 
-		context = domain+context;
-		String encryptedUserName;
 		try {
-			encryptedUserName = URLEncoder.encode(textEncryptor.encrypt(user.getLogin()),"UTF-8");
-			String confirmUrl = context+"/confirm?token="+encryptedUserName;
+			String confirmUrl = generateUserToken("confirm", user.getLogin());
 			//Send email:
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("userName", user.getFirstName());
 			model.put("confirmationLink", confirmUrl);
-			mailService.sendMail("laabidi.raissi@gmail.com", user.getEmail(), "Please confirm registration", model, "com/raissi/freemarker/confirm-register.ftl");
+			mailService.sendMail("raissi.java@gmail.com", user.getEmail(), "Please confirm registration", model, "com/raissi/freemarker/confirm-register.ftl");
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+	}
+	
+	@Override
+	public User findUserByEncryptedLoginOrEmail(String encrypted){
+		return userDao.findUserByLoginOrEmail(textEncryptor.decrypt(encrypted));
 	}
 	@Override
 	public int countCandidates() {

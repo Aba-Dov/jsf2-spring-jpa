@@ -1,6 +1,5 @@
 package com.raissi.managedbeans;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,8 +24,8 @@ import com.raissi.security.CustomUserDetails;
 import com.raissi.util.UserRole;
 
 @Component("loggedInUser")
-@Scope("session")
-public class LoggedInUser  implements Serializable{
+@Scope(value = "session", proxyMode = ScopedProxyMode.INTERFACES)
+public class LoggedInUser  implements ILoggedInUser{
 	private static final long serialVersionUID = -1033377115353626379L;
 	
 	@Inject
@@ -40,11 +40,6 @@ public class LoggedInUser  implements Serializable{
 	@PostConstruct
 	public void init(){
 	}
-
-	/**
-	 * Please call this.updateSecurityContext after setting user
-	 * @param user
-	 */
 	public void setUser(User user) {
 		this.user = user;
 	}
@@ -65,7 +60,6 @@ public class LoggedInUser  implements Serializable{
 		HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request) {
 		    @Override public String getParameter(String name) { return "true"; }            
 		};
-		System.out.println("---------------Remember me services in update: "+rememberMeServices);
 		rememberMeServices.loginSuccess(wrapper, response, authentication);
 	}
 

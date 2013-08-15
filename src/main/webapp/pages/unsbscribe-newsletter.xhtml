@@ -1,0 +1,24 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   template="/template/masterLayout.xhtml" 
+	xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <ui:define name="head">
+    	<title>Unsubscribe from our Newsletter</title>
+    </ui:define>
+    
+    <ui:define name="content">
+    <p:outputPanel rendered="#{not empty newsLetterManagedBean.user}">
+	    <h:form id="unsubscribeForm" prependId="false">
+		    <p:growl id="growl" showDetail="true" sticky="true"></p:growl>
+	    	Sorry, but we thought our Newsletter was just fantastic!!!<br/>
+	    	Are you sure you want to unsubscribe ? <br/>
+	    	<h:link outcome="pretty:candidate-home" value="Nope, that was an error" style="margin-right:10px"></h:link>
+	    	<p:commandButton actionListener="#{newsLetterManagedBean.unsubscribe}" update="growl" value="Yes, just take me out of here"></p:commandButton>
+	    </h:form>
+    </p:outputPanel>
+    </ui:define>
+    
+</ui:composition>    
